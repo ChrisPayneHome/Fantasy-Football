@@ -11,11 +11,14 @@ The porposed architecture for the project will look like this:
 flowchart LR
     subgraph kube[Kubernetes]
         db[(Postgres Database)]
-        app[(Web UI)]
+        ml(ML Endpoint)
+        app[Web UI]
     end
 
     api[Fantasy API]
 
     api --> db
-    db --> app	 
+    db --> app
+    db --> ml
+    ml --> db
 ```
