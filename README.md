@@ -8,14 +8,14 @@ The porposed architecture for the project will look like this:
 
 
 ```mermaid
-architecture-beta
-	group kube(cloud)[Kubernetes]
+flowchart LR
+    subgraph kube[Kubernetes]
+        db[(Postgres Database)]
+    end
 
-	service api(cloud)[Fantasy API]
-	service db(database)[Postgres Database] in kube
-	service app(server)[Web UI]
+    api[Fantasy API]
+    app[Web UI]
 
-	api:L -- db:R
-	db:T -- app:B
-	 
+    api --> db
+    db --> app	 
 ```
