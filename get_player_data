@@ -1,0 +1,21 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["pandas==2.2.2", "tqdm==4.66.4", "requests==2.31.0", "colorama==0.4.6", "pyarrow==15.0.2"]
+# ///
+
+from utils.player_functions import get_player_data
+
+
+def main():
+    """
+    Main function to retrieve data on Premier League Fantasy
+    Football players.
+    """
+    data = get_player_data()
+
+    data.to_parquet("data/full_player_data.parquet")
+
+
+if __name__ == "__main__":
+    main()
