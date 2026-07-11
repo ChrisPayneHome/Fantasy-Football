@@ -17,7 +17,8 @@ def get_player_data() -> pd.DataFrame:
     ---------
 
     pd.DataFrame :
-        A dataframe containing data about players.
+        A dataframe containing data about players with the following
+        columns:
     """
     base_url = "https://fantasy.premierleague.com/api/"
 
@@ -39,11 +40,11 @@ def get_player_data() -> pd.DataFrame:
         else:
             tqdm.write(f"{Fore.RED}❌   Wasn't able to pull current data for Player ID: {player_id}{Style.RESET_ALL}")
     
-    final_df = current_players.merge(player_history,
-                                     left_on="id",
-                                     right_on="element")
+    #final_df = current_players.merge(player_history,
+    #                                 left_on="id",
+    #                                 right_on="element")
 
-    return final_df
+    return current_players, player_history
 
 
 def get_current_players(base_url: str) -> pd.DataFrame:
@@ -83,6 +84,8 @@ def get_current_players(base_url: str) -> pd.DataFrame:
         right_on="id"
     )
 
+    df["full_name"] = df["first_name"] + " " + df["second_name"]
+
     return df
 
 
@@ -106,9 +109,11 @@ def get_player_history(base_url: str, player_id: int) -> pd.DataFrame:
 
     if r.status_code == 200:
         r = r.json()
+        upcoming_df = pd.json_normalize(r["fixtures"])
         history_df = pd.json_normalize(r["history"])
-        history_df["player_id"] = player_id
-        return history_df
+        final_df = pd.concat([upcoming_df, history_df])
+        final_df["player_id"] = player_id
+        return final_df
     else:
         return None
 
