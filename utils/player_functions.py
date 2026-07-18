@@ -19,6 +19,10 @@ def get_player_data() -> pd.DataFrame:
     pd.DataFrame :
         A dataframe containing data about players with the following
         columns:
+
+        ============================================================
+
+        
     """
     base_url = "https://fantasy.premierleague.com/api/"
 
@@ -30,11 +34,14 @@ def get_player_data() -> pd.DataFrame:
 
     player_history = pd.DataFrame()
 
-    for player_id in tqdm(range(1, 1_000)):
+    for player_id in tqdm(range(1, 10_000_000)):             #TODO: Need to make the player ID's more dynamic. What if there's more than N players?
         tqdm.write(f"{Fore.YELLOW}✉️   Sending historical data requests for Player ID: {player_id}{Style.RESET_ALL}")
         returned_df = get_player_history(base_url, player_id)
 
-        if returned_df is not None:
+        if returned_df.empty:
+            tqdm.write(f"{Fore.YELLOW}🚫   Reached the end of the player ID list: {player_id}{Style.RESET_ALL}")
+            break
+        elif returned_df is not None:
             player_history = pd.concat([player_history, returned_df], ignore_index=True)
             tqdm.write(f"{Fore.GREEN}✅   Successfully pulled current data for Player ID: {player_id}{Style.RESET_ALL}")
         else:
@@ -56,7 +63,7 @@ def get_current_players(base_url: str) -> pd.DataFrame:
     ---------
 
     base_url : str
-        The base url used to call out to the endpoint.
+        The base url used to call out to the player data endpoint.
 
     Returns
     ---------
@@ -114,6 +121,8 @@ def get_player_history(base_url: str, player_id: int) -> pd.DataFrame:
         final_df = pd.concat([upcoming_df, history_df])
         final_df["player_id"] = player_id
         return final_df
+    elif r.status_code == 404:
+        return pd.DataFrame()
     else:
         return None
 
